@@ -1,6 +1,8 @@
 FROM  python:3.8-buster
 
-ENV TZ=America/Los_Angeles
+ARG TZ=America/Los_Angeles
+ARG USER=python-user
+
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
         echo $TZ > /etc/timezone
 
@@ -15,6 +17,5 @@ COPY assets/ /
 
 RUN pip install -r requirements.txt
 
-RUN useradd --create-home explorer
-WORKDIR /
+RUN useradd --create-home $USER
 

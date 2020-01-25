@@ -1,11 +1,25 @@
 version: "2.2"
 services:
     explorer:
+        scale: 1
         build:
             context: ./services/explorer/docker
             dockerfile: Dockerfile
             args:
                 - TZ=${TZ}
+                - USERNAME=explorer
+        environment:
+            - CONFIG_DIR=EXPLORER_CONFIG_DIR
+            - DEFAULT_CONFIG=${EXPLORER_CONFIG_DIR}/explorer/${DEFAULT_CONFIG}
+        user: 1000:1000
+        working_dir: ${EXPLORER_SRC}/scripts
+        command: ["sh", "common/start_jupyter.sh"]
+        volumes:
+            - ./services/explorer/config:${EXPLORER_CONFIG_DIR}
+            - ./services/explorer/src/notebooks:/notebooks
+            - ./library/scripts/common:${EXPLORER_SRC}/scripts/common
+        ports:
+            - 8888:8888
 
     es01:
         image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2

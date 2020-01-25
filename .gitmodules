@@ -1,0 +1,3 @@
+[submodule "library/python"]
+	path = library/python
+	url = git@github.com:cheperuiz/aimachina-library
