@@ -1,3 +1,5 @@
 elasticsearch
 elasticsearch-dsl
 jupyter
+nltk
+pandas
