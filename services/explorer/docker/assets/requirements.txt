@@ -1,5 +1,7 @@
 elasticsearch
 elasticsearch-dsl
 jupyter
+ndjson
 nltk
 pandas
+textract

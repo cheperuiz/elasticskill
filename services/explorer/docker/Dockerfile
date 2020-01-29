@@ -25,6 +25,12 @@ RUN wget https://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corp
 
 RUN chmod -R 755 /usr/local/nltk_data/
 
+RUN apt-get update && apt-get install -y libxml2-dev            \
+        libxslt1-dev antiword unrtf poppler-utils               \
+        tesseract-ocr flac ffmpeg lame libmad0 libsox-fmt-mp3   \
+        sox libjpeg-dev swig libpulse-dev zlib1g-dev            \
+        && rm -rf /var/lib/apt/lists/*
+
 RUN pip install --upgrade pip
 
 COPY assets/ /

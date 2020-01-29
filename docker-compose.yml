@@ -14,18 +14,21 @@ services:
             - CONFIG_DIR=${CONFIG_DIR}
             - JUPYTER_CONFIG=${JUPYTER_CONFIG}
             - DEFAULT_CONFIG=${CONFIG_DIR}/explorer/default_config.yml
+            - PROJECT_SRC=${EXPLORER_SRC}
         user: 1000:1000
         working_dir: ${EXPLORER_SRC}/scripts
         command: ["sh", "common/start_jupyter.sh"]
         volumes:
+            - ./services/explorer/src:${EXPLORER_SRC}
             - ./services/explorer/config:${CONFIG_DIR}
-            - ./services/explorer/src/notebooks:${NOTEBOOKS_DIR}
+            - ./services/explorer/notebooks:${NOTEBOOKS_DIR}
             #Library code
-            - ./library/scripts:${EXPLORER_SRC}/scripts
-            - ./library/python/models/interface:${EXPLORER_SRC}/models/interface
+            - ./library/python/scripts:${EXPLORER_SRC}/scripts
             - ./library/python/utils:${EXPLORER_SRC}/utils
             #Data (Temporary)
             - ./data:/notebooks/data
+        networks:
+            - elastic
         ports:
             - 8888:8888
 
@@ -45,8 +48,8 @@ services:
                 hard: -1
         volumes:
             - data01:/usr/share/elasticsearch/data
-        ports:
-            - 9200:9200
+        # ports:
+        #     - 9200:9200
         networks:
             - elastic
 
@@ -66,8 +69,8 @@ services:
                 hard: -1
         volumes:
             - data02:/usr/share/elasticsearch/data
-        ports:
-            - 9201:9201
+        # ports:
+        #     - 9201:9201
         networks:
             - elastic
 
@@ -87,8 +90,8 @@ services:
                 hard: -1
         volumes:
             - data03:/usr/share/elasticsearch/data
-        ports:
-            - 9202:9202
+        # ports:
+        #     - 9202:9202
         networks:
             - elastic
 
