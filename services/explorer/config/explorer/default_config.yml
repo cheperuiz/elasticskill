@@ -1,0 +1,20 @@
+version: 1.0
+
+apis:
+    elasticskill:
+        prefix: /elasticskill/v1
+        title: ElasticSkill
+        version: 1
+        resources:
+            - tags
+
+database:
+    elasticsearch:
+        type: elasticsearch
+        hosts:
+            - host: es01
+              port: 9200
+            - host: es02
+              port: 9201
+            - host: es03
+              port: 9202

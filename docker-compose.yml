@@ -15,22 +15,26 @@ services:
             - JUPYTER_CONFIG=${JUPYTER_CONFIG}
             - DEFAULT_CONFIG=${CONFIG_DIR}/explorer/default_config.yml
             - PROJECT_SRC=${EXPLORER_SRC}
+            - GUNICORN_CONFIG=${GUNICORN_CONFIG}
         user: 1000:1000
         working_dir: ${EXPLORER_SRC}/scripts
-        command: ["sh", "common/start_jupyter.sh"]
+        command: ["sh","start_all.sh"]
         volumes:
             - ./services/explorer/src:${EXPLORER_SRC}
             - ./services/explorer/config:${CONFIG_DIR}
             - ./services/explorer/notebooks:${NOTEBOOKS_DIR}
             #Library code
-            - ./library/python/scripts:${EXPLORER_SRC}/scripts
+            - ./library/python/scripts/common:${EXPLORER_SRC}/scripts/common
             - ./library/python/utils:${EXPLORER_SRC}/utils
+            - ./library/python/app/factories:${EXPLORER_SRC}/app/factories
+            - ./library/python/database/elasticsearch.py:${EXPLORER_SRC}/database/elasticsearch.py
             #Data (Temporary)
             - ./data:/notebooks/data
         networks:
             - elastic
         ports:
-            - 8888:8888
+            - 8888:8888 #Jupyter notebook
+            - 5000:5000 #Elasticskill API
 
     es01:
         image: docker.elastic.co/elasticsearch/elasticsearch:7.5.2

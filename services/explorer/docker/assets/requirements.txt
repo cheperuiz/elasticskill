@@ -1,7 +1,12 @@
 elasticsearch
-elasticsearch-dsl
+flask
+flask-cors
+flask-restplus
+gunicorn
 jupyter
+marshmallow
 ndjson
 nltk
 pandas
+pyyaml
 textract
