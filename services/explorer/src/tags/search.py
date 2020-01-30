@@ -7,7 +7,7 @@ from utils.common import batch_generator
 
 def scroll_ids(es, index, fields=[], keywords=[], operator="or", pagesize=250, scroll_timeout="1m", **kwargs):
     body = {}
-    if len(keywords) > 0:
+    if any(keywords):
         query = {
             "query": " ".join(keywords),
             "operator": operator,
@@ -59,7 +59,7 @@ def aggregate_tags(tags):
     return aggregated_tags
 
 
-def sort_by_statistics(terms, ordered_fields=["ttf", "tf-idf", "doc_freq", "term_freq",]):
+def sort_by_statistics(terms, ordered_fields=["tf-idf", "ttf", "doc_freq", "term_freq",]):
     tuples = []
     for term, stats in terms.items():
         if stats["doc_freq"] <= 2:
