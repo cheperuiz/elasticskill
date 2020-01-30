@@ -52,14 +52,14 @@ def aggregate_tags(tags):
         if is_valid_term(term):
             if term not in aggregated_tags:
                 aggregated_tags[term] = statistics
-                aggregated_tags[term]["tf-idf"] = statistics["term_freq"] / statistics["doc_freq"]
+                aggregated_tags[term]["tfidf"] = statistics["term_freq"] / statistics["doc_freq"]
             else:
                 aggregated_tags[term]["term_freq"] += statistics["term_freq"]
-                aggregated_tags[term]["tf-idf"] += statistics["term_freq"] / statistics["doc_freq"]
+                aggregated_tags[term]["tfidf"] += statistics["term_freq"] / statistics["doc_freq"]
     return aggregated_tags
 
 
-def sort_by_statistics(terms, ordered_fields=["tf-idf", "ttf", "doc_freq", "term_freq",]):
+def sort_by_statistics(terms, ordered_fields=["term_freq", "tfidf", "ttf", "doc_freq",]):
     tuples = []
     for term, stats in terms.items():
         if stats["doc_freq"] <= 2:
@@ -68,7 +68,8 @@ def sort_by_statistics(terms, ordered_fields=["tf-idf", "ttf", "doc_freq", "term
         l.append(term)
         tuples.append(tuple(l))
     tuples.sort(reverse=True)
-    return tuples
+    dicts = [tag_tuple_to_dict(t, ordered_fields) for t in tuples]
+    return dicts
 
 
 def tags_from_index(es, index, fields, keywords, operator):
@@ -77,4 +78,12 @@ def tags_from_index(es, index, fields, keywords, operator):
     ):
         for tag in combine_tags_from_docs(es, index=index, ids=ids, fields=fields):
             yield tag
+
+
+def tag_tuple_to_dict(tup, fields):
+    d = {}
+    for i in range(len(tup) - 1):
+        d[fields[i]] = tup[i]
+    d["term"] = tup[-1]
+    return d
 

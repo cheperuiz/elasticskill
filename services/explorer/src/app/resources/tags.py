@@ -2,7 +2,7 @@
 # pylint: disable=no-name-in-module
 
 from flask_restplus import Namespace, Resource, reqparse
-from marshmallow import Schema
+from marshmallow import Schema, fields
 from elasticsearch.exceptions import TransportError
 
 from database.elasticsearch import es
@@ -27,13 +27,15 @@ fields_by_index = {
 class Tags(Resource):
     def get(self, index):
         parser = reqparse.RequestParser()
-        parser = parser.add_argument("keywords", default="")
-        parser = parser.add_argument("operator", default="or")
+        parser = parser.add_argument("keywords", type=str, default="")
+        parser = parser.add_argument("operator", type=str, default="or")
         parser = parser.add_argument("skip", type=int, default=0)
         parser = parser.add_argument("limit", type=int, default=None)
         parser = parser.add_argument("fields", default=fields_by_index.get(index, []))
         params = parser.parse_args()
+        print(params["operator"])
         try:
+            print(params["keywords"])
             tags = tags_from_index(
                 es,
                 index=index,
@@ -43,8 +45,8 @@ class Tags(Resource):
             )
             aggregated_tags = aggregate_tags(tags)
             sorted_tags = sort_by_statistics(aggregated_tags)
+
         except TransportError as e:
-            raise e
             return make_jsend_response(code=e.status_code)
         limit = params["skip"] + params["limit"] if params["limit"] else None
         return make_jsend_response(data=sorted_tags[params["skip"] : limit])

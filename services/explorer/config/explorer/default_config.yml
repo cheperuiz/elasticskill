@@ -2,7 +2,7 @@ version: 1.0
 
 apis:
     elasticskill:
-        prefix: /elasticskill/v1
+        prefix: /api/v1
         title: ElasticSkill
         version: 1
         resources:
