@@ -34,8 +34,23 @@
     <v-toolbar color="rgba(0,0,0,0)" flat>
       <v-spacer></v-spacer>
     </v-toolbar>
-    <v-row justify="space-around">
-      <v-card outlined class="ma-2" max-width="45%">
+    <v-row justify="space-around" class="mr-8">
+      <v-card outlined class="ma-2" width="25%">
+        <v-list-item>
+          <v-card-title class="display-1">Products:</v-card-title>
+          <v-spacer></v-spacer>
+          <v-avatar>
+            <v-icon class="display-1">mdi-chip</v-icon>
+          </v-avatar>
+        </v-list-item>
+        <v-container>
+          <v-chip @click="add(tag.term)" color="info" v-for="tag in categories" :key="tag.term">
+            <strong>{{tag.term}}</strong>
+          </v-chip>
+        </v-container>
+      </v-card>
+
+      <v-card outlined class="ma-2" width="25%">
         <v-list-item>
           <v-card-title class="display-1">Projects & Tasks:</v-card-title>
           <v-spacer></v-spacer>
@@ -54,7 +69,8 @@
           </v-chip>
         </v-container>
       </v-card>
-      <v-card outlined class="ma-2" max-width="45%">
+
+      <v-card outlined class="ma-2" width="25%">
         <v-list-item>
           <v-card-title class="display-1">Discussions:</v-card-title>
           <v-spacer></v-spacer>
@@ -88,7 +104,8 @@ export default {
       offset: 0,
       tasksTags: null,
       tasksColors: [20, 10],
-      threadsColors: [100, 50]
+      threadsColors: [100, 50],
+      products: ["imx", "i.mx", "lpc", "s32"]
     };
   },
   watch: {
@@ -108,24 +125,41 @@ export default {
   computed: {
     operator() {
       return !!this.and ? "and" : "or";
+    },
+    categories() {
+      let categories = this.tasksTags.filter(e =>
+        this.products.some(p => e.term.includes(p))
+      );
+      let threads = this.threadsTags.filter(e =>
+        this.products.some(p => e.term.includes(p))
+      );
+      return categories.concat(
+        threads.filter(e => !categories.some(c => c.term == e.term))
+      );
     }
   },
   async asyncData({ app, params }) {
     const offset = 0;
     const pagesize = 50;
-
-    const { data: tasksResp } = await app.$axios.get(`/tags/tasks`, {
-      params: { skip: offset, limit: pagesize }
-    });
-    const { data: threadsResp } = await app.$axios.get(`/tags/threads`, {
-      params: { skip: offset, limit: pagesize }
-    });
-    const tasksTags = tasksResp.data.values;
-    const threadsTags = threadsResp.data.values;
-    return {
-      tasksTags,
-      threadsTags
-    };
+    try {
+      const { data: tasksResp } = await app.$axios.get(`/tags/tasks`, {
+        params: { skip: offset, limit: pagesize }
+      });
+      const { data: threadsResp } = await app.$axios.get(`/tags/threads`, {
+        params: { skip: offset, limit: pagesize }
+      });
+      const tasksTags = tasksResp.data.values;
+      const threadsTags = threadsResp.data.values;
+      return {
+        tasksTags,
+        threadsTags
+      };
+    } catch {
+      return {
+        tasksTags: [],
+        threadsTags: []
+      };
+    }
   },
   methods: {
     remove(item) {
@@ -139,16 +173,19 @@ export default {
     },
     async fetchTags(index, params) {
       const url = `/tags/${index}`;
-      const { data: resp } = await this.$axios.get(url, {
-        params: {
-          keywords: params.keywords.join(","),
-          limit: params.limit,
-          skip: params.skip,
-          operator: params.operator
-        }
-      });
-      console.log(params.operator);
-      return resp.data.values;
+      try {
+        const { data: resp } = await this.$axios.get(url, {
+          params: {
+            keywords: params.keywords.join(","),
+            limit: params.limit,
+            skip: params.skip,
+            operator: params.operator
+          }
+        });
+        return resp.data.values;
+      } catch {
+        return [];
+      }
     },
     colorFor(item, colors) {
       if (item.term_freq >= colors[0]) return "light-green";
